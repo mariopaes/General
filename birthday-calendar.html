@@ -22,61 +22,21 @@
     min-height: 100vh;
     padding: 20px 16px 60px;
   }
-
-  /* ── Header ── */
   header { text-align: center; margin-bottom: 20px; }
   header h1 { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--accent); }
   header p  { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
 
-  /* ── Setup Banner ── */
-  #setup-banner {
-    background: #fff8e1;
-    border: 2px solid #ffc107;
-    border-radius: 16px;
-    padding: 18px;
-    margin-bottom: 20px;
-  }
-  #setup-banner h3 { font-size: 1rem; color: #7a5800; margin-bottom: 10px; }
-  #setup-banner ol { padding-left: 18px; font-size: 0.88rem; line-height: 2; color: #555; }
-  #setup-banner ol li strong { color: #1a1a1a; }
-  #url-input {
-    width: 100%;
-    border: 1.5px solid #ffc107;
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 0.9rem;
-    margin: 12px 0 8px;
-    font-family: 'DM Sans', sans-serif;
-    background: #fffdf5;
-  }
-  #url-input:focus { outline: none; border-color: var(--accent); }
-  #btn-connect {
-    width: 100%;
-    background: #ffc107;
-    border: none;
-    border-radius: 10px;
-    padding: 11px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-  }
-  #btn-connect:active { opacity: 0.8; }
-
-  /* ── Status ── */
   #status {
     text-align: center;
     font-size: 0.82rem;
     min-height: 20px;
     margin-bottom: 10px;
     color: var(--muted);
-    transition: color 0.2s;
   }
   #status.ok    { color: #2ea84a; }
   #status.error { color: #e8614b; }
   #status.busy  { color: #f5a623; }
 
-  /* ── Upcoming Banner ── */
   #upcoming {
     border-radius: 16px;
     padding: 14px 18px;
@@ -88,7 +48,6 @@
   #upcoming strong { display: block; font-size: 1.05rem; margin-bottom: 2px; }
   #upcoming span   { font-size: 0.85rem; opacity: 0.9; }
 
-  /* ── Month Cards ── */
   #months { display: flex; flex-direction: column; gap: 12px; }
   .month-card {
     background: var(--card);
@@ -104,17 +63,15 @@
     padding: 12px 16px;
     color: #fff;
   }
-  .month-name { font-family: 'Playfair Display', serif; font-size: 1.1rem; letter-spacing: 0.3px; }
+  .month-name { font-family: 'Playfair Display', serif; font-size: 1.1rem; }
   .btn-add {
     background: rgba(255,255,255,0.25);
-    border: none;
-    color: #fff;
+    border: none; color: #fff;
     border-radius: 50%;
     width: 30px; height: 30px;
     font-size: 1.3rem;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    line-height: 1;
   }
   .btn-add:active { background: rgba(255,255,255,0.45); }
 
@@ -128,30 +85,20 @@
   }
   .entry:last-child { border-bottom: none; }
   .day-pill {
-    color: #fff;
-    font-weight: 700;
-    font-size: 0.85rem;
-    border-radius: 8px;
-    min-width: 38px;
-    height: 38px;
+    color: #fff; font-weight: 700; font-size: 0.85rem;
+    border-radius: 8px; min-width: 38px; height: 38px;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
   .entry-name  { flex: 1; font-size: 1rem; font-weight: 500; }
   .entry-btns  { display: flex; gap: 4px; }
   .btn-edit, .btn-del {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.05rem;
-    padding: 5px;
-    border-radius: 8px;
-    transition: background 0.15s;
+    background: none; border: none; cursor: pointer;
+    font-size: 1.05rem; padding: 5px; border-radius: 8px;
   }
   .btn-edit:active, .btn-del:active { background: var(--border); }
   .empty { padding: 14px 16px; color: var(--muted); font-size: 0.85rem; font-style: italic; }
 
-  /* ── Modal ── */
   .overlay {
     display: none; position: fixed; inset: 0;
     background: rgba(0,0,0,0.45); z-index: 200;
@@ -169,14 +116,9 @@
   .sheet h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--accent); margin-bottom: 18px; }
   .sheet label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--muted); margin: 14px 0 4px; text-transform: uppercase; letter-spacing: 0.5px; }
   .sheet input {
-    width: 100%;
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    padding: 11px 14px;
-    font-size: 1rem;
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
+    width: 100%; border: 1.5px solid var(--border); border-radius: 10px;
+    padding: 11px 14px; font-size: 1rem;
+    font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text);
   }
   .sheet input:focus { outline: none; border-color: var(--accent); }
   .sheet-actions { display: flex; gap: 10px; margin-top: 22px; }
@@ -188,36 +130,18 @@
   }
   .btn-primary:disabled { opacity: 0.55; }
   .btn-secondary {
-    background: var(--border); color: var(--text);
-    border: none; border-radius: 12px; padding: 13px 20px;
-    font-size: 1rem; cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
+    background: var(--border); color: var(--text); border: none;
+    border-radius: 12px; padding: 13px 20px;
+    font-size: 1rem; cursor: pointer; font-family: 'DM Sans', sans-serif;
   }
-
-  .spinner { display: inline-block; animation: spin 0.8s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
 
 <header>
   <h1>🎂 Birthdays</h1>
-  <p>Backed by Google Sheets · tap <b>+</b> to add · ✏️ edit · 🗑 delete</p>
+  <p>Synced with Google Sheets · tap <b>+</b> to add</p>
 </header>
-
-<!-- Setup -->
-<div id="setup-banner">
-  <h3>⚙️ One-time Setup</h3>
-  <ol>
-    <li>Open your Google Sheet → <strong>Extensions → Apps Script</strong></li>
-    <li>Paste the <strong>Code.gs</strong> file contents, then Save</li>
-    <li>Click <strong>Deploy → New deployment → Web app</strong></li>
-    <li>Set <em>Execute as</em>: <strong>Me</strong> · <em>Who has access</em>: <strong>Anyone</strong></li>
-    <li>Click Deploy → Authorize → Copy the URL below</li>
-  </ol>
-  <input id="url-input" type="url" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
-  <button id="btn-connect" onclick="connect()">Connect to Google Sheets 🔗</button>
-</div>
 
 <div id="upcoming">
   <strong id="upcoming-name"></strong>
@@ -227,7 +151,6 @@
 <div id="status"></div>
 <div id="months"></div>
 
-<!-- Modal -->
 <div class="overlay" id="overlay">
   <div class="sheet">
     <h3 id="modal-title">Add Birthday</h3>
@@ -243,59 +166,41 @@
 </div>
 
 <script>
-// ── Config ───────────────────────────────────────────────────
+// ── Hardcoded — no setup needed ──────────────────────────────
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzeYrUEF3O3cyR4X5-Evx-2PCZn6qvRZ3HHV2ZRLBqYjfClWAm8xbUgGy7wheXJu56YVA/exec";
+
 const MONTHS = ['January','February','March','April','May','June',
                 'July','August','September','October','November','December'];
 const COLORS  = ['#e8614b','#e0735c','#d98870','#e8934b','#d4a017','#7ab648',
                  '#3aaa6e','#3d9b8e','#3d78ba','#8a5db8','#c44d8f','#e85478'];
 
-let SCRIPT_URL = localStorage.getItem('bday-url') || '';
 let entries = [];
 let modal = { monthIdx: null, entryId: null };
 
-// ── Boot ─────────────────────────────────────────────────────
-if (SCRIPT_URL) {
-  document.getElementById('setup-banner').style.display = 'none';
-  loadAll();
-}
-
-function connect() {
-  const val = document.getElementById('url-input').value.trim();
-  if (!val.startsWith('https://script.google.com')) {
-    alert('Please paste a valid Apps Script Web App URL.');
-    return;
-  }
-  SCRIPT_URL = val;
-  localStorage.setItem('bday-url', SCRIPT_URL);
-  document.getElementById('setup-banner').style.display = 'none';
-  loadAll();
-}
-
 // ── API ──────────────────────────────────────────────────────
 async function api(params) {
-  const url = SCRIPT_URL + '?' + new URLSearchParams(params);
-  const res  = await fetch(url);
+  const res  = await fetch(SCRIPT_URL + '?' + new URLSearchParams(params));
   const json = await res.json();
   if (json.error) throw new Error(json.error);
   return json;
 }
 
-function status(msg, type = '') {
+function setStatus(msg, type = '') {
   const el = document.getElementById('status');
   el.textContent = msg;
   el.className = type;
 }
 
 async function loadAll() {
-  status('⏳ Loading…', 'busy');
+  setStatus('⏳ Loading…', 'busy');
   try {
     const data = await api({ action: 'getAll' });
     entries = data.entries;
     render();
-    status('✓ Synced with Google Sheets', 'ok');
-    setTimeout(() => status(''), 3000);
+    setStatus('✓ Synced', 'ok');
+    setTimeout(() => setStatus(''), 3000);
   } catch (e) {
-    status('⚠️ ' + e.message, 'error');
+    setStatus('⚠️ Could not load: ' + e.message, 'error');
   }
 }
 
@@ -303,25 +208,24 @@ async function loadAll() {
 function render() {
   const container = document.getElementById('months');
   container.innerHTML = '';
-
   MONTHS.forEach((name, mi) => {
-    const monthEntries = entries.filter(e => e.month === mi).sort((a, b) => a.day - b.day);
-    const card = document.createElement('div');
+    const month = entries.filter(e => e.month === mi).sort((a,b) => a.day - b.day);
+    const card  = document.createElement('div');
     card.className = 'month-card';
     card.innerHTML = `
       <div class="month-header" style="background:${COLORS[mi]}">
         <span class="month-name">${name}</span>
-        <button class="btn-add" onclick="openAdd(${mi})" title="Add birthday">+</button>
+        <button class="btn-add" onclick="openAdd(${mi})">+</button>
       </div>
       <div class="entries">
-        ${monthEntries.length
-          ? monthEntries.map(e => `
-              <div class="entry" id="entry-${e.id}">
+        ${month.length
+          ? month.map(e => `
+              <div class="entry">
                 <div class="day-pill" style="background:${COLORS[mi]}">${e.day}</div>
-                <div class="entry-name">${escHtml(e.name)}</div>
+                <div class="entry-name">${esc(e.name)}</div>
                 <div class="entry-btns">
-                  <button class="btn-edit" onclick="openEdit('${e.id}')" title="Edit">✏️</button>
-                  <button class="btn-del"  onclick="delEntry('${e.id}','${escHtml(e.name)}')" title="Delete">🗑</button>
+                  <button class="btn-edit" onclick="openEdit('${e.id}')">✏️</button>
+                  <button class="btn-del"  onclick="delEntry('${e.id}','${esc(e.name)}')">🗑</button>
                 </div>
               </div>`).join('')
           : '<div class="empty">No birthdays — tap + to add</div>'
@@ -329,25 +233,20 @@ function render() {
       </div>`;
     container.appendChild(card);
   });
-
   renderUpcoming();
 }
 
 function renderUpcoming() {
   const now = new Date();
-  const cm = now.getMonth(), cd = now.getDate();
   let best = null;
-
   for (let offset = 0; offset < 365; offset++) {
-    const d = new Date(now); d.setDate(cd + offset);
-    const m = d.getMonth(), day = d.getDate();
-    const match = entries.find(e => e.month === m && e.day === day);
+    const d = new Date(now); d.setDate(now.getDate() + offset);
+    const match = entries.find(e => e.month === d.getMonth() && e.day === d.getDate());
     if (match) { best = { ...match, offset }; break; }
   }
-
   const el = document.getElementById('upcoming');
   if (best) {
-    document.getElementById('upcoming-name').textContent = best.name + "'s Birthday 🎂";
+    document.getElementById('upcoming-name').textContent  = best.name + "'s Birthday 🎂";
     document.getElementById('upcoming-label').textContent =
       best.offset === 0 ? '🎉 Today!' :
       best.offset === 1 ? 'Tomorrow' :
@@ -358,8 +257,8 @@ function renderUpcoming() {
   }
 }
 
-function escHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 // ── Modal ────────────────────────────────────────────────────
@@ -389,13 +288,11 @@ function closeModal() {
 async function saveEntry() {
   const name = document.getElementById('f-name').value.trim();
   const day  = parseInt(document.getElementById('f-day').value);
-  if (!name)          return alert('Please enter a name.');
+  if (!name)               return alert('Please enter a name.');
   if (!day||day<1||day>31) return alert('Please enter a valid day (1–31).');
 
   const btn = document.getElementById('btn-save');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner">⏳</span> Saving…';
-
+  btn.disabled = true; btn.textContent = '⏳ Saving…';
   try {
     if (modal.entryId) {
       await api({ action: 'update', id: modal.entryId, month: modal.monthIdx, day, name });
@@ -405,33 +302,32 @@ async function saveEntry() {
     closeModal();
     await loadAll();
   } catch (err) {
-    alert('Error saving: ' + err.message);
+    alert('Error: ' + err.message);
   } finally {
-    btn.disabled = false;
-    btn.textContent = 'Save 🎉';
+    btn.disabled = false; btn.textContent = 'Save 🎉';
   }
 }
 
 async function delEntry(id, name) {
   if (!confirm(`Delete ${name}?`)) return;
-  status('Deleting…', 'busy');
+  setStatus('Deleting…', 'busy');
   try {
     await api({ action: 'delete', id });
     await loadAll();
   } catch (err) {
-    status('Error: ' + err.message, 'error');
+    setStatus('Error: ' + err.message, 'error');
   }
 }
 
-// Close modal on backdrop tap
 document.getElementById('overlay').addEventListener('click', e => {
   if (e.target === document.getElementById('overlay')) closeModal();
 });
-
-// Allow Enter key to save
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && document.getElementById('overlay').classList.contains('open')) saveEntry();
 });
+
+// ── Start ────────────────────────────────────────────────────
+loadAll();
 </script>
 </body>
 </html>
