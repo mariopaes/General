@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday Calendar</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fdf6ee;
+    --card: #fff;
+    --accent: #e8614b;
+    --accent2: #f5a623;
+    --text: #1a1a1a;
+    --muted: #888;
+    --border: #f0e8df;
+    --month-empty: #f9f2ea;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 20px 16px 40px;
+  }
+  header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+  header p {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .months { display: flex; flex-direction: column; gap: 12px; }
+
+  .month-card {
+    background: var(--card);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border: 1px solid var(--border);
+  }
+  .month-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--accent);
+    color: #fff;
+  }
+  .month-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+  }
+  .add-btn {
+    background: rgba(255,255,255,0.25);
+    border: none;
+    color: #fff;
+    border-radius: 50%;
+    width: 28px; height: 28px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .add-btn:active { background: rgba(255,255,255,0.4); }
+
+  .entries { padding: 4px 0; }
+  .entry {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+    position: relative;
+  }
+  .entry:last-child { border-bottom: none; }
+  .day-badge {
+    background: var(--accent2);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    min-width: 36px;
+    height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .entry-name {
+    flex: 1;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  .entry-name[contenteditable="true"] {
+    outline: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .entry-actions {
+    display: flex;
+    gap: 6px;
+  }
+  .edit-btn, .del-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 4px;
+    border-radius: 6px;
+    transition: background 0.15s;
+  }
+  .edit-btn:active, .del-btn:active { background: var(--border); }
+  .empty-state {
+    padding: 14px 16px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-style: italic;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 100;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--card);
+    border-radius: 24px 24px 0 0;
+    padding: 24px 20px 36px;
+    width: 100%;
+    max-width: 480px;
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .modal h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    margin-bottom: 18px;
+    color: var(--accent);
+  }
+  .modal label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 4px;
+    margin-top: 14px;
+  }
+  .modal input {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 1rem;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  .modal input:focus { outline: none; border-color: var(--accent); }
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .btn-save {
+    flex: 1;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 13px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-cancel {
+    background: var(--border);
+    color: var(--text);
+    border: none;
+    border-radius: 12px;
+    padding: 13px 18px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .upcoming-banner {
+    background: linear-gradient(135deg, var(--accent) 0%, #f5823b 100%);
+    color: #fff;
+    border-radius: 16px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+  }
+  .upcoming-banner strong { font-size: 1rem; display: block; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎂 Birthdays</h1>
+  <p>Tap + to add • Tap ✏️ to edit • Tap 🗑 to delete</p>
+</header>
+
+<div id="upcoming-banner"></div>
+<div class="months" id="months-container"></div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">Add Birthday</h3>
+    <label>Name</label>
+    <input type="text" id="input-name" placeholder="e.g. Sarah">
+    <label>Day (1–31)</label>
+    <input type="number" id="input-day" min="1" max="31" placeholder="e.g. 15">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveEntry()">Save 🎉</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MONTH_COLORS = ['#e8614b','#e0735c','#d9856d','#e8934b','#e8a63b','#c5b642','#52aa6b','#3d9b8e','#3d78ba','#8a5db8','#c44d8f','#e85478'];
+
+let data = JSON.parse(localStorage.getItem('bday-data') || 'null') || {
+  0:[{day:23,name:'Minnette'}],
+  1:[{day:18,name:'Pramilla'},{day:27,name:'Norton'}],
+  2:[{day:8,name:'Sapana'}],
+  3:[],
+  4:[{day:1,name:'Mavola'},{day:31,name:'Sharon'}],
+  5:[],
+  6:[{day:4,name:'Varsha'},{day:26,name:'Sachin'}],
+  7:[],
+  8:[{day:14,name:'Mark'}],
+  9:[{day:31,name:'Savio Pereira'}],
+  10:[{day:4,name:'Stella'}],
+  11:[{day:24,name:'Olavro'},{day:30,name:'Leo'}]
+};
+
+let editTarget = null; // {monthIdx, entryIdx} or {monthIdx} for new
+
+function save() {
+  localStorage.setItem('bday-data', JSON.stringify(data));
+}
+
+function render() {
+  const container = document.getElementById('months-container');
+  container.innerHTML = '';
+
+  MONTHS.forEach((month, mi) => {
+    const entries = data[mi] || [];
+    const card = document.createElement('div');
+    card.className = 'month-card';
+
+    const sorted = [...entries].sort((a,b)=>a.day-b.day);
+
+    card.innerHTML = `
+      <div class="month-header" style="background:${MONTH_COLORS[mi]}">
+        <span class="month-name">${month}</span>
+        <button class="add-btn" onclick="openAdd(${mi})">+</button>
+      </div>
+      <div class="entries" id="entries-${mi}">
+        ${sorted.length === 0
+          ? `<div class="empty-state">No birthdays yet</div>`
+          : sorted.map((e,i) => `
+            <div class="entry">
+              <div class="day-badge" style="background:${MONTH_COLORS[mi]}">${e.day}</div>
+              <div class="entry-name">${e.name}</div>
+              <div class="entry-actions">
+                <button class="edit-btn" onclick="openEdit(${mi},${entries.indexOf(e)})">✏️</button>
+                <button class="del-btn" onclick="deleteEntry(${mi},${entries.indexOf(e)})">🗑</button>
+              </div>
+            </div>
+          `).join('')
+        }
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  renderUpcoming();
+}
+
+function renderUpcoming() {
+  const now = new Date();
+  const curMonth = now.getMonth();
+  const curDay = now.getDate();
+  let upcoming = [];
+
+  for (let offset = 0; offset < 30; offset++) {
+    const d = new Date(now); d.setDate(curDay + offset);
+    const m = d.getMonth(), day = d.getDate();
+    (data[m]||[]).forEach(e => {
+      if (e.day === day) upcoming.push({name: e.name, day, month: m, offset});
+    });
+  }
+
+  const banner = document.getElementById('upcoming-banner');
+  if (upcoming.length) {
+    const next = upcoming[0];
+    const label = next.offset === 0 ? "🎉 Today!" : next.offset === 1 ? "Tomorrow" : `In ${next.offset} days`;
+    banner.innerHTML = `<div class="upcoming-banner"><strong>${next.name}'s Birthday</strong>${label} · ${MONTHS[next.month]} ${next.day}</div>`;
+  } else {
+    banner.innerHTML = '';
+  }
+}
+
+function openAdd(mi) {
+  editTarget = {monthIdx: mi};
+  document.getElementById('modal-title').textContent = `Add Birthday — ${MONTHS[mi]}`;
+  document.getElementById('input-name').value = '';
+  document.getElementById('input-day').value = '';
+  document.getElementById('modal').classList.add('open');
+  setTimeout(()=>document.getElementById('input-name').focus(),300);
+}
+
+function openEdit(mi, ei) {
+  editTarget = {monthIdx: mi, entryIdx: ei};
+  const e = data[mi][ei];
+  document.getElementById('modal-title').textContent = `Edit Birthday`;
+  document.getElementById('input-name').value = e.name;
+  document.getElementById('input-day').value = e.day;
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  editTarget = null;
+}
+
+function saveEntry() {
+  const name = document.getElementById('input-name').value.trim();
+  const day = parseInt(document.getElementById('input-day').value);
+  if (!name || !day || day < 1 || day > 31) {
+    alert('Please enter a valid name and day.');
+    return;
+  }
+  if (editTarget.entryIdx !== undefined) {
+    data[editTarget.monthIdx][editTarget.entryIdx] = {day, name};
+  } else {
+    if (!data[editTarget.monthIdx]) data[editTarget.monthIdx] = [];
+    data[editTarget.monthIdx].push({day, name});
+  }
+  save();
+  closeModal();
+  render();
+}
+
+function deleteEntry(mi, ei) {
+  if (!confirm(`Delete ${data[mi][ei].name}?`)) return;
+  data[mi].splice(ei, 1);
+  save();
+  render();
+}
+
+// Close modal on overlay tap
+document.getElementById('modal').addEventListener('click', function(e){
+  if (e.target === this) closeModal();
+});
+
+render();
+</script>
+</body>
+</html>
