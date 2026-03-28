@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday & Anniversary Calendar</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fdf6ee; --card: #fff; --accent-b: #e8614b; --accent-a: #9b59b6;
+    --text: #1a1a1a; --muted: #888; --border: #f0e8df;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 20px 16px 40px; }
+
+  header { text-align: center; margin-bottom: 16px; }
+  header h1 { font-family: 'Playfair Display', serif; font-size: 1.9rem; color: var(--accent-b); }
+  header p { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+
+  /* Tab switcher */
+  .tab-bar { display: flex; gap: 8px; margin-bottom: 16px; background: #fff; border-radius: 14px; padding: 5px; border: 1px solid var(--border); }
+  .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 10px; font-size: 0.9rem; font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer; background: none; color: var(--muted); transition: all 0.2s; }
+  .tab-btn.active-b { background: var(--accent-b); color: #fff; }
+  .tab-btn.active-a { background: var(--accent-a); color: #fff; }
+
+  .sync-bar { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.78rem; color: var(--muted); margin-bottom: 14px; flex-wrap: wrap; }
+  .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0; }
+  .sync-dot.ok { background: #4caf50; }
+  .sync-dot.err { background: #e8614b; }
+  .sync-dot.loading { background: #f5a623; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .sync-btn { background: none; border: none; cursor: pointer; font-size: 0.78rem; color: var(--accent-b); }
+  .reset-btn { background: none; border: none; cursor: pointer; font-size: 0.78rem; color: var(--muted); }
+
+  .months { display: flex; flex-direction: column; gap: 12px; }
+  .month-card { background: var(--card); border-radius: 16px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid var(--border); }
+  .month-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; color: #fff; }
+  .month-name { font-family: 'Playfair Display', serif; font-size: 1.1rem; }
+  .add-btn { background: rgba(255,255,255,0.25); border: none; color: #fff; border-radius: 50%; width: 28px; height: 28px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .entries { padding: 4px 0; }
+  .entry { display: flex; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--border); gap: 12px; }
+  .entry:last-child { border-bottom: none; }
+  .day-badge { color: #fff; font-weight: 700; font-size: 0.85rem; border-radius: 8px; min-width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .entry-info { flex: 1; }
+  .entry-name { font-size: 1rem; font-weight: 500; }
+  .entry-year { font-size: 0.75rem; color: var(--muted); margin-top: 1px; }
+  .entry-actions { display: flex; gap: 6px; }
+  .edit-btn, .del-btn { background: none; border: none; cursor: pointer; font-size: 1rem; padding: 4px; border-radius: 6px; }
+  .empty-state { padding: 14px 16px; color: var(--muted); font-size: 0.85rem; font-style: italic; }
+
+  .upcoming-banner { border-radius: 16px; padding: 14px 18px; margin-bottom: 16px; font-size: 0.9rem; color: #fff; }
+  .upcoming-banner.bday { background: linear-gradient(135deg, #e8614b 0%, #f5823b 100%); }
+  .upcoming-banner.anni { background: linear-gradient(135deg, #9b59b6 0%, #c06dd6 100%); }
+  .upcoming-banner strong { font-size: 1rem; display: block; margin-bottom: 4px; }
+
+  /* Modal */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: flex-end; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--card); border-radius: 24px 24px 0 0; padding: 24px 20px 36px; width: 100%; max-width: 480px; animation: slideUp 0.25s ease; }
+  @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+  .modal h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 18px; }
+  .modal h3.bday { color: var(--accent-b); }
+  .modal h3.anni { color: var(--accent-a); }
+  .modal label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--muted); margin-bottom: 4px; margin-top: 14px; }
+  .modal input { width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 14px; font-size: 1rem; font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
+  .modal input:focus { outline: none; border-color: var(--accent-b); }
+  .modal input.anni-focus:focus { border-color: var(--accent-a); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+  .btn-save { flex: 1; color: #fff; border: none; border-radius: 12px; padding: 13px; font-size: 1rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .btn-save.bday { background: var(--accent-b); }
+  .btn-save.anni { background: var(--accent-a); }
+  .btn-cancel { background: var(--border); color: var(--text); border: none; border-radius: 12px; padding: 13px 18px; font-size: 1rem; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- Main App -->
+<div id="app" style="display:none">
+  <header>
+    <h1>🎂 Familia Paes Celebrations</h1>
+    <p>Tap + to add &nbsp;·&nbsp; ✏️ to edit &nbsp;·&nbsp; 🗑 to delete</p>
+  </header>
+
+  <div class="tab-bar">
+    <button class="tab-btn active-b" id="tab-b" onclick="switchTab('b')">🎂 Birthdays</button>
+    <button class="tab-btn" id="tab-a" onclick="switchTab('a')">💍 Anniversaries</button>
+  </div>
+
+  <div class="sync-bar">
+    <div class="sync-dot" id="sync-dot"></div>
+    <span id="sync-label">Loading…</span>
+    <button class="sync-btn" onclick="loadFromSheet()">↻ Refresh</button>
+  </div>
+
+  <div id="upcoming-banner"></div>
+
+  <!-- Birthdays tab -->
+  <div class="tab-content active" id="content-b">
+    <div class="months" id="months-b"></div>
+  </div>
+
+  <!-- Anniversaries tab -->
+  <div class="tab-content" id="content-a">
+    <div class="months" id="months-a"></div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3 id="modal-title" class="bday">Add Birthday</h3>
+    <label>Name(s)</label>
+    <input type="text" id="input-name" placeholder="e.g. Sarah">
+    <label>Day (1–31)</label>
+    <input type="number" id="input-day" min="1" max="31" placeholder="e.g. 15">
+    <div id="year-field" style="display:none">
+      <label>Year (optional, e.g. 2005)</label>
+      <input type="number" id="input-year" min="1900" max="2100" placeholder="e.g. 1998" class="anni-focus">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save bday" id="btn-save" onclick="saveEntry()">Save 🎉</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const MONTHS  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const B_COLORS = ['#e8614b','#e0735c','#d9856d','#e8934b','#e8a63b','#c5b642','#52aa6b','#3d9b8e','#3d78ba','#8a5db8','#c44d8f','#e85478'];
+const A_COLORS = ['#7d3c98','#884da3','#935fae','#9e71b9','#a983c4','#b495cf','#6c3483','#7b4f9e','#8a6bb9','#9987d4','#a8a3ef','#7d6eb8'];
+
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwlohOtuSsDsZ03RhAdK-apm0T5wuRzypov6zkGXYug8UZ9OlThFHpEqi-lPC04oyCXtA/exec';
+let birthdays   = [];
+let anniversaries = [];
+let editTarget  = null;
+let currentTab  = 'b';
+
+// ── Tabs ───────────────────────────────────────────────────
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('content-b').classList.toggle('active', tab === 'b');
+  document.getElementById('content-a').classList.toggle('active', tab === 'a');
+  document.getElementById('tab-b').className = 'tab-btn' + (tab === 'b' ? ' active-b' : '');
+  document.getElementById('tab-a').className = 'tab-btn' + (tab === 'a' ? ' active-a' : '');
+  renderUpcoming();
+}
+
+// ── Sync ───────────────────────────────────────────────────
+function setSyncStatus(state, msg) {
+  document.getElementById('sync-dot').className = 'sync-dot ' + state;
+  document.getElementById('sync-label').textContent = msg;
+}
+
+async function loadFromSheet() {
+  setSyncStatus('loading', 'Loading…');
+  try {
+    const res  = await fetch(SCRIPT_URL + '?action=read');
+    const json = await res.json();
+    if (json.error) throw new Error(json.error);
+    birthdays     = json.birthdays     || [];
+    anniversaries = json.anniversaries || [];
+    setSyncStatus('ok', 'Synced ✓');
+    render();
+  } catch (err) {
+    setSyncStatus('err', 'Could not load — check URL');
+    console.error(err);
+  }
+}
+
+async function saveBirthdays() {
+  setSyncStatus('loading', 'Saving…');
+  try {
+    const res  = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'write-birthdays', data: JSON.stringify(birthdays) }) });
+    const json = await res.json();
+    if (json.error) throw new Error(json.error);
+    setSyncStatus('ok', 'Saved ✓');
+  } catch (err) { setSyncStatus('err', 'Save failed'); console.error(err); }
+}
+
+async function saveAnniversaries() {
+  setSyncStatus('loading', 'Saving…');
+  try {
+    const res  = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'write-anniversaries', data: JSON.stringify(anniversaries) }) });
+    const json = await res.json();
+    if (json.error) throw new Error(json.error);
+    setSyncStatus('ok', 'Saved ✓');
+  } catch (err) { setSyncStatus('err', 'Save failed'); console.error(err); }
+}
+
+// ── Render ─────────────────────────────────────────────────
+function render() {
+  renderMonths('b', birthdays,     'months-b', B_COLORS, false);
+  renderMonths('a', anniversaries, 'months-a', A_COLORS, true);
+  renderUpcoming();
+}
+
+function renderMonths(tab, entries, containerId, colors, showYear) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  MONTHS.forEach((month, mi) => {
+    const monthNum = mi + 1;
+    const list = entries.filter(e => e.month === monthNum).sort((a,b) => a.day - b.day);
+    const card = document.createElement('div');
+    card.className = 'month-card';
+    card.innerHTML = `
+      <div class="month-header" style="background:${colors[mi]}">
+        <span class="month-name">${month}</span>
+        <button class="add-btn" onclick="openAdd(${monthNum},'${tab}')">+</button>
+      </div>
+      <div class="entries">
+        ${list.length === 0
+          ? `<div class="empty-state">Nothing here yet</div>`
+          : list.map(e => {
+              const yearsAgo = (showYear && e.year) ? ` · ${new Date().getFullYear() - e.year} yrs` : '';
+              return `
+                <div class="entry">
+                  <div class="day-badge" style="background:${colors[mi]}">${e.day}</div>
+                  <div class="entry-info">
+                    <div class="entry-name">${tab === 'a' ? '💍 ' : ''}${e.names || e.name}</div>
+                    ${(showYear && e.year) ? `<div class="entry-year">Since ${e.year}${yearsAgo}</div>` : ''}
+                  </div>
+                  <div class="entry-actions">
+                    <button class="edit-btn" onclick='openEdit(${JSON.stringify(e)},"${tab}")'>✏️</button>
+                    <button class="del-btn"  onclick='deleteEntry(${JSON.stringify(e)},"${tab}")'>🗑</button>
+                  </div>
+                </div>`;
+            }).join('')
+        }
+      </div>`;
+    container.appendChild(card);
+  });
+}
+
+function renderUpcoming() {
+  const now = new Date();
+  const cm = now.getMonth() + 1, cd = now.getDate();
+  let upcoming = [];
+  for (let offset = 0; offset < 30; offset++) {
+    const d = new Date(); d.setDate(cd + offset);
+    const m = d.getMonth() + 1, day = d.getDate();
+    birthdays.filter(e => e.month === m && e.day === day)
+      .forEach(e => upcoming.push({ label: e.name, offset, type: 'b', month: m, day }));
+    anniversaries.filter(e => e.month === m && e.day === day)
+      .forEach(e => upcoming.push({ label: e.names, offset, type: 'a', month: m, day, year: e.year }));
+  }
+  const banner = document.getElementById('upcoming-banner');
+  if (upcoming.length) {
+    const n = upcoming[0];
+    const timeLabel = n.offset === 0 ? '🎉 Today!' : n.offset === 1 ? 'Tomorrow' : `In ${n.offset} days`;
+    const typeLabel = n.type === 'b' ? 'Birthday' : 'Anniversary';
+    const yrs = (n.type === 'a' && n.year) ? ` · ${new Date().getFullYear() - n.year} years` : '';
+    banner.innerHTML = `<div class="upcoming-banner ${n.type === 'b' ? 'bday' : 'anni'}"><strong>${n.label}'s ${typeLabel}${yrs}</strong>${timeLabel} · ${MONTHS[n.month-1]} ${n.day}</div>`;
+  } else { banner.innerHTML = ''; }
+}
+
+// ── Modal ──────────────────────────────────────────────────
+function openAdd(monthNum, tab) {
+  editTarget = { monthNum, tab, original: null };
+  const isAnni = tab === 'a';
+  document.getElementById('modal-title').textContent = `Add ${isAnni ? 'Anniversary' : 'Birthday'} — ${MONTHS[monthNum-1]}`;
+  document.getElementById('modal-title').className = isAnni ? 'anni' : 'bday';
+  document.getElementById('btn-save').className = `btn-save ${isAnni ? 'anni' : 'bday'}`;
+  document.getElementById('input-name').placeholder = isAnni ? 'e.g. John & Mary' : 'e.g. Sarah';
+  document.getElementById('year-field').style.display = isAnni ? 'block' : 'none';
+  document.getElementById('input-name').value = '';
+  document.getElementById('input-day').value  = '';
+  document.getElementById('input-year').value = '';
+  document.getElementById('modal').classList.add('open');
+  setTimeout(() => document.getElementById('input-name').focus(), 300);
+}
+
+function openEdit(entry, tab) {
+  editTarget = { monthNum: entry.month, tab, original: entry };
+  const isAnni = tab === 'a';
+  document.getElementById('modal-title').textContent = `Edit ${isAnni ? 'Anniversary' : 'Birthday'}`;
+  document.getElementById('modal-title').className = isAnni ? 'anni' : 'bday';
+  document.getElementById('btn-save').className = `btn-save ${isAnni ? 'anni' : 'bday'}`;
+  document.getElementById('input-name').placeholder = isAnni ? 'e.g. John & Mary' : 'e.g. Sarah';
+  document.getElementById('year-field').style.display = isAnni ? 'block' : 'none';
+  document.getElementById('input-name').value = entry.names || entry.name || '';
+  document.getElementById('input-day').value  = entry.day;
+  document.getElementById('input-year').value = entry.year || '';
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  editTarget = null;
+}
+
+async function saveEntry() {
+  const nameVal = document.getElementById('input-name').value.trim();
+  const day     = parseInt(document.getElementById('input-day').value);
+  const year    = parseInt(document.getElementById('input-year').value) || null;
+  if (!nameVal || !day || day < 1 || day > 31) { alert('Please enter a valid name and day.'); return; }
+
+  const { monthNum, tab, original } = editTarget;
+  const isAnni = tab === 'a';
+
+  if (isAnni) {
+    const newEntry = { month: monthNum, day, names: nameVal, year };
+    if (original) {
+      const idx = anniversaries.findIndex(e => e.month === original.month && e.day === original.day && e.names === original.names);
+      if (idx > -1) anniversaries[idx] = newEntry; else anniversaries.push(newEntry);
+    } else { anniversaries.push(newEntry); }
+    closeModal(); render(); await saveAnniversaries();
+  } else {
+    const newEntry = { month: monthNum, day, name: nameVal };
+    if (original) {
+      const idx = birthdays.findIndex(e => e.month === original.month && e.day === original.day && e.name === original.name);
+      if (idx > -1) birthdays[idx] = newEntry; else birthdays.push(newEntry);
+    } else { birthdays.push(newEntry); }
+    closeModal(); render(); await saveBirthdays();
+  }
+}
+
+async function deleteEntry(entry, tab) {
+  const label = entry.names || entry.name;
+  if (!confirm(`Delete ${label}?`)) return;
+  if (tab === 'a') {
+    anniversaries = anniversaries.filter(e => !(e.month === entry.month && e.day === entry.day && e.names === entry.names));
+    render(); await saveAnniversaries();
+  } else {
+    birthdays = birthdays.filter(e => !(e.month === entry.month && e.day === entry.day && e.name === entry.name));
+    render(); await saveBirthdays();
+  }
+}
+
+document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+document.getElementById('app').style.display = 'block';
+loadFromSheet();
+</script>
+</body>
+</html>
