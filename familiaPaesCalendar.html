@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Paes Birthday & Anniversary Calendar</title>
+<title>Birthday & Anniversary Calendar</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -71,41 +71,13 @@
   .btn-save.anni { background: var(--accent-a); }
   .btn-cancel { background: var(--border); color: var(--text); border: none; border-radius: 12px; padding: 13px 18px; font-size: 1rem; cursor: pointer; font-family: 'DM Sans', sans-serif; }
 
-  /* Config */
-  #config-screen { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; z-index: 200; text-align: center; overflow-y: auto; }
-  #config-screen h2 { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--accent-b); margin-bottom: 10px; }
-  #config-screen p { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.5; }
-  .steps { text-align: left; max-width: 420px; width: 100%; background: #fff; border-radius: 14px; padding: 16px 20px; margin-bottom: 20px; border: 1px solid var(--border); }
-  .steps ol { padding-left: 20px; }
-  .steps li { font-size: 0.85rem; color: var(--text); margin-bottom: 8px; line-height: 1.5; }
-  .steps a { color: var(--accent-b); }
-  .steps code { font-size: 0.78rem; background: var(--bg); padding: 2px 6px; border-radius: 4px; }
-  #script-url-input { width: 100%; max-width: 420px; border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 16px; font-size: 0.9rem; font-family: 'DM Sans', sans-serif; background: #fff; color: var(--text); margin-bottom: 12px; }
-  #script-url-input:focus { outline: none; border-color: var(--accent-b); }
-  #connect-btn { width: 100%; max-width: 420px; background: var(--accent-b); color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 1rem; font-family: 'DM Sans', sans-serif; cursor: pointer; }
+
 
   .tab-content { display: none; }
   .tab-content.active { display: block; }
 </style>
 </head>
 <body>
-
-<!-- Config Screen -->
-<div id="config-screen">
-  <h2>🎂 Birthday & Anniversary Calendar</h2>
-  <p>Connect your Google Sheet to sync across all your devices.</p>
-  <div class="steps">
-    <ol>
-      <li>Open <a href="https://script.google.com" target="_blank">script.google.com</a> → <strong>New Project</strong></li>
-      <li>Paste the contents of <code>birthday-script.gs</code> and <strong>Save 💾</strong></li>
-      <li>Function dropdown → select <strong>setup</strong> → <strong>Run ▶</strong> · Authorise when prompted</li>
-      <li><strong>Deploy → New Deployment → Web App</strong><br>Execute as: <em>Me</em> · Who has access: <em>Anyone</em> → Deploy</li>
-      <li>Copy the <strong>Web App URL</strong> and paste below</li>
-    </ol>
-  </div>
-  <input type="url" id="script-url-input" placeholder="https://script.google.com/macros/s/..." />
-  <button id="connect-btn" onclick="saveScriptUrl()">Connect &amp; Load 🎉</button>
-</div>
 
 <!-- Main App -->
 <div id="app" style="display:none">
@@ -123,7 +95,6 @@
     <div class="sync-dot" id="sync-dot"></div>
     <span id="sync-label">Loading…</span>
     <button class="sync-btn" onclick="loadFromSheet()">↻ Refresh</button>
-    <button class="reset-btn" onclick="forgetUrl()">⚙ Reset</button>
   </div>
 
   <div id="upcoming-banner"></div>
@@ -163,32 +134,11 @@ const MONTHS  = ['January','February','March','April','May','June','July','Augus
 const B_COLORS = ['#e8614b','#e0735c','#d9856d','#e8934b','#e8a63b','#c5b642','#52aa6b','#3d9b8e','#3d78ba','#8a5db8','#c44d8f','#e85478'];
 const A_COLORS = ['#7d3c98','#884da3','#935fae','#9e71b9','#a983c4','#b495cf','#6c3483','#7b4f9e','#8a6bb9','#9987d4','#a8a3ef','#7d6eb8'];
 
-let SCRIPT_URL  = localStorage.getItem('bday-script-url') || '';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwlohOtuSsDsZ03RhAdK-apm0T5wuRzypov6zkGXYug8UZ9OlThFHpEqi-lPC04oyCXtA/exec';
 let birthdays   = [];
 let anniversaries = [];
 let editTarget  = null;
 let currentTab  = 'b';
-
-// ── Setup ──────────────────────────────────────────────────
-function saveScriptUrl() {
-  const url = document.getElementById('script-url-input').value.trim();
-  if (!url.startsWith('https://script.google.com')) { alert('Please paste a valid Google Apps Script Web App URL.'); return; }
-  localStorage.setItem('bday-script-url', url);
-  SCRIPT_URL = url;
-  startApp();
-}
-function forgetUrl() {
-  if (!confirm('Disconnect from Google Sheet?')) return;
-  localStorage.removeItem('bday-script-url');
-  SCRIPT_URL = '';
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('config-screen').style.display = 'flex';
-}
-function startApp() {
-  document.getElementById('config-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  loadFromSheet();
-}
 
 // ── Tabs ───────────────────────────────────────────────────
 function switchTab(tab) {
@@ -383,7 +333,8 @@ async function deleteEntry(entry, tab) {
 
 document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
 
-if (SCRIPT_URL) startApp();
+document.getElementById('app').style.display = 'block';
+loadFromSheet();
 </script>
 </body>
 </html>
